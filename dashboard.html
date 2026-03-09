@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - MasterVault</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fa-solid fa-shield-halved"></i>
+            <h2>MasterVault</h2>
+        </div>
+        <div class="nav-actions">
+            <div class="search-bar">
+                <i class="fa-solid fa-search"></i>
+                <input type="text" id="search-input" placeholder="Search websites...">
+            </div>
+            <button id="theme-toggle" class="icon-btn" title="Toggle Dark Mode"><i class="fa-solid fa-moon"></i></button>
+            <button id="logout-btn" class="btn danger-btn"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+        </div>
+    </nav>
+
+    <main class="dashboard-container">
+        <section class="form-section card">
+            <h3><i class="fa-solid fa-plus"></i> Add New Password</h3>
+            <form id="password-form">
+                <input type="hidden" id="edit-id">
+                <div class="input-group">
+                    <input type="text" id="site-name" placeholder="Website Name (e.g., LinkedIn)" required>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="username" placeholder="Username or Email" required>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="site-password" placeholder="Password" required>
+                    <button type="button" class="toggle-password icon-btn"><i class="fa-solid fa-eye"></i></button>
+                </div>
+                <div class="strength-meter">
+                    <div id="strength-bar"></div>
+                </div>
+                <p id="strength-text" class="small-text"></p>
+                <button type="submit" class="btn primary-btn" id="save-btn">Save Password</button>
+            </form>
+        </section>
+
+        <section class="passwords-section">
+            <h3><i class="fa-solid fa-vault"></i> Saved Passwords</h3>
+            <div id="passwords-grid" class="grid-container">
+                </div>
+        </section>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

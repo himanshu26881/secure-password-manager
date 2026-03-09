@@ -1,0 +1,196 @@
+/* --- Premium Variables & Theming --- */
+:root {
+    /* Light Mode: Soft Tech Gradient */
+    --bg-gradient: linear-gradient(135deg, #451571 0%, #8ec5fc 100%);
+    --card-bg: rgba(219, 207, 71, 0.171);
+    --card-border: rgb(255, 255, 255);
+    --text-color: #000000;
+    --text-muted: #00ffb7;
+    --primary-color: #2ce57f;
+    --primary-hover: #4338ca;
+    --primary-glow: rgba(79, 70, 229, 0.4);
+    --danger-color: #ef4444;
+    --danger-hover: #dc2626;
+    --input-bg: rgba(255, 255, 255, 0.9);
+    --input-border: #d1d5db;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dark-mode {
+    /* Dark Mode: Deep Sleek Gradient */
+    --bg-gradient: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+    --card-bg: rgba(30, 41, 59, 0.75);
+    --card-border: rgba(255, 255, 255, 0.1);
+    --text-color: #f8fafc;
+    --text-muted: #94a3b8;
+    --input-bg: rgba(15, 23, 42, 0.6);
+    --input-border: #334155;
+}
+
+/* --- Global Styles --- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+}
+
+body {
+    background: var(--bg-gradient);
+    background-attachment: fixed;
+    color: var(--text-color);
+    transition: var(--transition);
+    min-height: 100vh;
+}
+
+/* --- Typography --- */
+h2, h3 { font-weight: 700; letter-spacing: -0.5px; }
+.subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; }
+.small-text { font-size: 0.85rem; color: var(--text-muted); margin-top: 5px; }
+
+/* --- Glassmorphism Cards --- */
+.card {
+    background: var(--card-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    padding: 2.5rem;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--card-border);
+    transition: var(--transition);
+}
+
+/* --- Buttons --- */
+.btn {
+    padding: 0.85rem 1.5rem;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.primary-btn {
+    background: var(--primary-color);
+    color: white;
+    width: 100%;
+    box-shadow: 0 4px 15px var(--primary-glow);
+}
+
+.primary-btn:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px var(--primary-glow);
+}
+
+.danger-btn { background: var(--danger-color); color: white; }
+.danger-btn:hover { background: var(--danger-hover); transform: translateY(-2px); }
+
+.icon-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: var(--transition);
+    padding: 8px;
+    border-radius: 50%;
+}
+
+.icon-btn:hover {
+    color: var(--primary-color);
+    background: rgba(128, 128, 128, 0.1);
+}
+
+/* --- Inputs & Forms --- */
+.input-group {
+    position: relative;
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 14px;
+    color: var(--text-muted);
+    transition: var(--transition);
+}
+
+input[type="text"], input[type="password"] {
+    width: 100%;
+    padding: 1rem 1rem 1rem 2.8rem;
+    border: 2px solid var(--input-border);
+    border-radius: 12px;
+    background: var(--input-bg);
+    color: var(--text-color);
+    font-size: 1rem;
+    transition: var(--transition);
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px var(--primary-glow);
+}
+
+.input-group:focus-within .input-icon { color: var(--primary-color); }
+
+.toggle-password {
+    position: absolute;
+    right: 8px;
+}
+
+/* --- Login Specifics --- */
+.login-container {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+}
+
+.login-card { width: 100%; max-width: 420px; text-align: center; }
+
+.logo { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 0.5rem; color: var(--primary-color); }
+.logo-icon-bg { background: var(--primary-glow); padding: 15px; border-radius: 15px; font-size: 1.8rem; margin-bottom: 5px;}
+
+/* Keep the rest of your dashboard and grid layouts from the previous version, they will automatically inherit this new glass design! */
+
+/* --- New Utility Classes for Password Recovery --- */
+.hidden {
+    display: none !important;
+}
+
+.text-link {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-top: 1rem;
+    transition: var(--transition);
+}
+
+.text-link:hover {
+    color: var(--primary-hover);
+    text-decoration: underline;
+}
+
+.security-group {
+    text-align: left;
+    margin-bottom: 1.2rem;
+}
+
+.security-group label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+    display: block;
+}

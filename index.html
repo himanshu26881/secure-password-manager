@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Password Manager - Login</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="card login-card">
+            <div class="logo">
+                <div class="logo-icon-bg"><i class="fa-solid fa-shield-halved"></i></div>
+                <h2>MasterVault</h2>
+            </div>
+            
+            <div id="setup-section" class="hidden">
+                <p class="subtitle">Welcome! Set up your vault.</p>
+                <form id="setup-form">
+                    <div class="input-group">
+                        <i class="fa-solid fa-lock input-icon"></i>
+                        <input type="password" id="new-master" placeholder="Create Master Unlock" required>
+                    </div>
+                    <div class="security-group">
+                        <label>Select Security Question (for password recovery)</label>
+                        <select id="sec-question" required style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 2px solid var(--input-border); background: var(--input-bg); color: var(--text-color);">
+                            <option value="What was the name of your first pet?">What was the name of your first crush?</option>
+                            <option value="What city were you born in?">What city were you born in?</option>
+                            <option value="What is your favorite childhood movie?">What is your favorite bollywood movie?</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <i class="fa-solid fa-key input-icon"></i>
+                        <input type="text" id="sec-answer" placeholder="Set Your Answer" required>
+                    </div>
+                    <button type="submit" class="btn primary-btn">Initialize Vault <i class="fa-solid fa-check"></i></button>
+                </form>
+            </div>
+
+            <div id="login-section" class="hidden">
+                <p class="subtitle">Enter your Master Password to unlock</p>
+                <form id="login-form">
+                    <div class="input-group">
+                        <i class="fa-solid fa-lock input-icon"></i>
+                        <input type="password" id="master-password" placeholder="Master Password" required>
+                        <button type="button" class="icon-btn toggle-password" id="toggle-master" title="Show/Hide">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                    <button type="submit" class="btn primary-btn">Unlock Vault <i class="fa-solid fa-arrow-right"></i></button>
+                </form>
+                <button id="show-recovery-btn" class="text-link">Forgot Password?</button>
+            </div>
+
+            <div id="recovery-section" class="hidden">
+                <p class="subtitle">Answer your security question to reset</p>
+                <form id="recovery-form">
+                    <p id="display-question" style="font-weight: bold; margin-bottom: 1rem; font-size: 0.9rem;"></p>
+                    <div class="input-group">
+                        <i class="fa-solid fa-shield input-icon"></i>
+                        <input type="text" id="recovery-answer" placeholder="Your Answer" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fa-solid fa-lock input-icon"></i>
+                        <input type="password" id="reset-password" placeholder="New Master Password" required>
+                    </div>
+                    <button type="submit" class="btn primary-btn">Reset Password <i class="fa-solid fa-rotate-right"></i></button>
+                </form>
+                <button id="back-to-login-btn" class="text-link">Back to Login</button>
+            </div>
+
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
