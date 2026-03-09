@@ -1,4 +1,4 @@
-# 🛡️ ModernVault: Modern Password Manager
+# 🛡️ MasterVault: Modern Password Manager
 
 ![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white) ![CSS3](https://img.shields.io/badge/css3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white) ![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)
 
@@ -67,5 +67,6 @@ Open index.html directly in your preferred modern web browser (Chrome, Firefox, 
 Security Disclaimer: This application utilizes Base64 encoding for demonstration purposes. In a production environment, sensitive data should never be stored in localStorage due to Cross-Site Scripting (XSS) vulnerabilities, and true encryption algorithms (like AES-GCM via the Web Crypto API) should be utilized alongside a secure backend architecture.
 
 Offline First: By relying entirely on Web Storage APIs, this application is fully functional without an internet connection.
+
 
 Developed by Himanshu Kumar for the BCA Project Presentation.
