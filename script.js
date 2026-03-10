@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ==========================================
-// LOGIN & RECOVERY LOGIC
+// LOGIN, RECOVERY, & BIOMETRIC LOGIC
 // ==========================================
 function initLogin() {
     // Sections
@@ -36,31 +36,70 @@ function initLogin() {
     const loginSection = document.getElementById('login-section');
     const recoverySection = document.getElementById('recovery-section');
     
+    // Elements
+    const biometricLoginBtn = document.getElementById('biometric-login-btn');
+    const enableBiometricsCheckbox = document.getElementById('enable-biometrics');
+    
     // Check if vault is already set up
     const hasMaster = localStorage.getItem('masterPassword');
+    const biometricsEnabled = localStorage.getItem('biometricsEnabled') === 'true';
     
     if (!hasMaster) {
         setupSection.classList.remove('hidden');
     } else {
         loginSection.classList.remove('hidden');
+        // Show the biometric unlock button if the user opted in during setup
+        if (biometricsEnabled && window.PublicKeyCredential) {
+            biometricLoginBtn.classList.remove('hidden');
+        }
     }
 
     // --- SETUP FLOW ---
-    document.getElementById('setup-form')?.addEventListener('submit', (e) => {
+    document.getElementById('setup-form')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const pwd = document.getElementById('new-master').value;
         const question = document.getElementById('sec-question').value;
-        const answer = document.getElementById('sec-answer').value.toLowerCase().trim(); // Convert to lowercase for easier matching later
+        const answer = document.getElementById('sec-answer').value.toLowerCase().trim();
 
+        // Check if user wants biometrics and if their device supports it
+        if (enableBiometricsCheckbox.checked) {
+            if (window.PublicKeyCredential) {
+                try {
+                    // This triggers the device to "register" a fingerprint/face
+                    const publicKeyCredentialCreationOptions = {
+                        challenge: Uint8Array.from("randomStringFromServer", c => c.charCodeAt(0)),
+                        rp: { name: "Master Vault", id: window.location.hostname },
+                        user: {
+                            id: Uint8Array.from("USER_ID", c => c.charCodeAt(0)),
+                            name: "user@mastervault",
+                            displayName: "Master Vault User"
+                        },
+                        pubKeyCredParams: [{alg: -7, type: "public-key"}],
+                        authenticatorSelection: { authenticatorAttachment: "platform" },
+                        timeout: 60000
+                    };
+                    await navigator.credentials.create({ publicKey: publicKeyCredentialCreationOptions });
+                    localStorage.setItem('biometricsEnabled', 'true');
+                } catch (err) {
+                    alert("Biometric setup cancelled or failed. Proceeding with password only.");
+                    localStorage.setItem('biometricsEnabled', 'false');
+                }
+            } else {
+                alert("Your device or browser does not support biometric login.");
+                localStorage.setItem('biometricsEnabled', 'false');
+            }
+        }
+
+        // Save normal credentials
         localStorage.setItem('masterPassword', encrypt(pwd));
         localStorage.setItem('secQuestion', question);
-        localStorage.setItem('secAnswer', encrypt(answer)); // Encrypt the answer too!
+        localStorage.setItem('secAnswer', encrypt(answer));
         
         sessionStorage.setItem('isAuthenticated', 'true');
         window.location.href = 'dashboard.html';
     });
 
-    // --- NORMAL LOGIN FLOW ---
+    // --- NORMAL PASSWORD LOGIN FLOW ---
     document.getElementById('login-form')?.addEventListener('submit', (e) => {
         e.preventDefault();
         const pwd = document.getElementById('master-password').value;
@@ -72,6 +111,31 @@ function initLogin() {
             alert("Incorrect Master Password! Access Denied.");
         }
     });
+
+    // --- NEW: BIOMETRIC LOGIN FLOW ---
+    if (biometricLoginBtn) {
+        biometricLoginBtn.addEventListener('click', async () => {
+            try {
+                // This triggers the device to "ask" for the fingerprint/face to unlock
+                const publicKeyCredentialRequestOptions = {
+                    challenge: Uint8Array.from("randomStringFromServer", c => c.charCodeAt(0)),
+                    timeout: 60000,
+                    rpId: window.location.hostname
+                };
+                
+                const assertion = await navigator.credentials.get({ publicKey: publicKeyCredentialRequestOptions });
+                
+                if (assertion) {
+                    // If fingerprint matches, log them in!
+                    sessionStorage.setItem('isAuthenticated', 'true');
+                    window.location.href = 'dashboard.html';
+                }
+            } catch (err) {
+                alert("Biometric verification failed. Please use your Master Password.");
+                console.error(err);
+            }
+        });
+    }
 
     // Toggle Eye Icon
     const toggleMasterBtn = document.getElementById('toggle-master');
@@ -110,7 +174,6 @@ function initLogin() {
             alert("Security answer correct! Password has been reset.");
             localStorage.setItem('masterPassword', encrypt(newPassword));
             
-            // Go back to login screen
             document.getElementById('recovery-form').reset();
             recoverySection.classList.add('hidden');
             loginSection.classList.remove('hidden');
@@ -121,7 +184,7 @@ function initLogin() {
 }
 
 // ==========================================
-// DASHBOARD LOGIC (Unchanged, kept complete for copy-pasting)
+// DASHBOARD LOGIC (Unchanged)
 // ==========================================
 function initDashboard() {
     let passwords = JSON.parse(localStorage.getItem('passwords')) || [];
