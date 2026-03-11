@@ -1,6 +1,14 @@
 // ==========================================
-// UTILITY & ENCRYPTION FUNCTIONS
+// PWA SERVICE WORKER REGISTRATION
 // ==========================================
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        // Removed the './' to make the path direct
+        navigator.serviceWorker.register('sw.js')
+            .then(reg => console.log('Service Worker registered successfully.'))
+            .catch(err => console.error('Service Worker registration failed:', err));
+    });
+}
 const encrypt = (text) => btoa(text);
 const decrypt = (hash) => atob(hash);
 
