@@ -31,16 +31,13 @@ document.addEventListener('DOMContentLoaded', () => {
 // LOGIN, RECOVERY, & BIOMETRIC LOGIC
 // ==========================================
 function initLogin() {
-    // Sections
     const setupSection = document.getElementById('setup-section');
     const loginSection = document.getElementById('login-section');
     const recoverySection = document.getElementById('recovery-section');
     
-    // Elements
     const biometricLoginBtn = document.getElementById('biometric-login-btn');
     const enableBiometricsCheckbox = document.getElementById('enable-biometrics');
     
-    // Check if vault is already set up
     const hasMaster = localStorage.getItem('masterPassword');
     const biometricsEnabled = localStorage.getItem('biometricsEnabled') === 'true';
     
@@ -48,24 +45,20 @@ function initLogin() {
         setupSection.classList.remove('hidden');
     } else {
         loginSection.classList.remove('hidden');
-        // Show the biometric unlock button if the user opted in during setup
         if (biometricsEnabled && window.PublicKeyCredential) {
             biometricLoginBtn.classList.remove('hidden');
         }
     }
 
-    // --- SETUP FLOW ---
     document.getElementById('setup-form')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const pwd = document.getElementById('new-master').value;
         const question = document.getElementById('sec-question').value;
         const answer = document.getElementById('sec-answer').value.toLowerCase().trim();
 
-        // Check if user wants biometrics and if their device supports it
         if (enableBiometricsCheckbox.checked) {
             if (window.PublicKeyCredential) {
                 try {
-                    // This triggers the device to "register" a fingerprint/face
                     const publicKeyCredentialCreationOptions = {
                         challenge: Uint8Array.from("randomStringFromServer", c => c.charCodeAt(0)),
                         rp: { name: "Master Vault", id: window.location.hostname },
@@ -90,7 +83,6 @@ function initLogin() {
             }
         }
 
-        // Save normal credentials
         localStorage.setItem('masterPassword', encrypt(pwd));
         localStorage.setItem('secQuestion', question);
         localStorage.setItem('secAnswer', encrypt(answer));
@@ -99,7 +91,6 @@ function initLogin() {
         window.location.href = 'dashboard.html';
     });
 
-    // --- NORMAL PASSWORD LOGIN FLOW ---
     document.getElementById('login-form')?.addEventListener('submit', (e) => {
         e.preventDefault();
         const pwd = document.getElementById('master-password').value;
@@ -112,11 +103,9 @@ function initLogin() {
         }
     });
 
-    // --- NEW: BIOMETRIC LOGIN FLOW ---
     if (biometricLoginBtn) {
         biometricLoginBtn.addEventListener('click', async () => {
             try {
-                // This triggers the device to "ask" for the fingerprint/face to unlock
                 const publicKeyCredentialRequestOptions = {
                     challenge: Uint8Array.from("randomStringFromServer", c => c.charCodeAt(0)),
                     timeout: 60000,
@@ -126,7 +115,6 @@ function initLogin() {
                 const assertion = await navigator.credentials.get({ publicKey: publicKeyCredentialRequestOptions });
                 
                 if (assertion) {
-                    // If fingerprint matches, log them in!
                     sessionStorage.setItem('isAuthenticated', 'true');
                     window.location.href = 'dashboard.html';
                 }
@@ -137,7 +125,6 @@ function initLogin() {
         });
     }
 
-    // Toggle Eye Icon
     const toggleMasterBtn = document.getElementById('toggle-master');
     const masterInput = document.getElementById('master-password');
     if (toggleMasterBtn) {
@@ -152,7 +139,6 @@ function initLogin() {
         });
     }
 
-    // --- RECOVERY FLOW ---
     document.getElementById('show-recovery-btn')?.addEventListener('click', () => {
         loginSection.classList.add('hidden');
         recoverySection.classList.remove('hidden');
@@ -184,7 +170,7 @@ function initLogin() {
 }
 
 // ==========================================
-// DASHBOARD LOGIC (Unchanged)
+// DASHBOARD LOGIC (With 4 Pro Features)
 // ==========================================
 function initDashboard() {
     let passwords = JSON.parse(localStorage.getItem('passwords')) || [];
@@ -196,6 +182,54 @@ function initDashboard() {
     const themeBtn = document.getElementById('theme-toggle');
     const passInput = document.getElementById('site-password');
     const strengthBar = document.getElementById('strength-bar');
+
+    // FEATURE 1: Auto-Logout on Inactivity (3 Minutes)
+    let inactivityTimer;
+    const resetInactivityTimer = () => {
+        clearTimeout(inactivityTimer);
+        inactivityTimer = setTimeout(() => {
+            sessionStorage.removeItem('isAuthenticated');
+            alert("Vault automatically locked due to inactivity for your security.");
+            window.location.href = 'index.html';
+        }, 3 * 60 * 1000); 
+    };
+    ['mousemove', 'keydown', 'scroll', 'click'].forEach(evt => 
+        document.addEventListener(evt, resetInactivityTimer)
+    );
+    resetInactivityTimer();
+
+    // FEATURE 2: Export Vault Data
+    const exportBtn = document.getElementById('export-btn');
+    if (exportBtn) {
+        exportBtn.addEventListener('click', () => {
+            const dataStr = localStorage.getItem('passwords') || "[]";
+            const blob = new Blob([dataStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "MasterVault_Encrypted_Backup.json";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+    }
+
+    // FEATURE 3: Secure Password Generator
+    const generateBtn = document.getElementById('generate-btn');
+    if (generateBtn) {
+        generateBtn.addEventListener('click', () => {
+            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
+            let randomPass = "";
+            for (let i = 0; i < 16; i++) {
+                randomPass += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            passInput.value = randomPass;
+            passInput.type = 'text'; 
+            document.querySelector('.toggle-password').innerHTML = '<i class="fa-solid fa-eye-slash"></i>';
+            passInput.dispatchEvent(new Event('input')); 
+        });
+    }
 
     const render = (filterText = '') => {
         grid.innerHTML = '';
@@ -230,6 +264,13 @@ function initDashboard() {
         const password = encrypt(document.getElementById('site-password').value);
         const editId = document.getElementById('edit-id').value;
 
+        // FEATURE 4: Duplicate Password Warning
+        const isDuplicate = passwords.some(p => p.password === password && p.id != editId);
+        if (isDuplicate) {
+            const proceed = confirm("⚠️ Security Warning: You have already used this exact password for another website. Reusing passwords makes your accounts vulnerable. Do you still want to save it?");
+            if (!proceed) return; 
+        }
+
         if (editId) {
             const index = passwords.findIndex(p => p.id == editId);
             passwords[index] = { id: editId, site, username, password };
@@ -241,6 +282,8 @@ function initDashboard() {
         localStorage.setItem('passwords', JSON.stringify(passwords));
         form.reset();
         strengthBar.style.width = '0%'; 
+        passInput.type = 'password'; 
+        document.querySelector('.toggle-password').innerHTML = '<i class="fa-solid fa-eye"></i>';
         render();
     });
 
@@ -313,6 +356,7 @@ function initDashboard() {
                 document.getElementById('site-name').value = target.site;
                 document.getElementById('username').value = target.username;
                 document.getElementById('site-password').value = decrypt(target.password);
+                passInput.dispatchEvent(new Event('input')); 
             });
         });
     }
